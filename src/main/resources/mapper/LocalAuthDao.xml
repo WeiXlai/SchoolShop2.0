@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.weilai.o2o.dao.LocalAuthDao">
+	<resultMap type="com.weilai.o2o.entity.LocalAuth" id="LocalAuthMap">
+		<id property="localAuthId" column="local_auth_id"/>
+		<result property="username" column="user_name"/>
+		<result property="password" column="password"/>
+		<result property="createTime" column="create_time"/>
+		<result property="lastEditTime" column="last_edit_time"/>
+		<association property="personInfo" column="user_id" javaType="com.weilai.o2o.entity.PersonInfo">
+		  <id property="userId" column="user_id"/>
+		  <result property="name" column="name"/>
+		  <result property="gender" column="gender"/>
+		  <result property="email" column="email"/>
+		  <result property="profileImg" column="profile_img"/>
+		  <result property="userType" column="user_type"/>
+		  <result property="createTime" column="create_time"/>
+		  <result property="lastEditTime" column="last_edit_time"/>
+		  <result property="enableStatus" column="enable_status"/>
+		</association>
+	</resultMap>
+	
+	<insert id="insertLocalAuth" parameterType="com.weilai.o2o.entity.LocalAuth"
+	  useGeneratedKeys="true" keyProperty="localAuthId" keyColumn="local_auth_id">
+		insert into tb_local_auth
+		(user_id,user_name,password,create_time,last_edit_time)
+		values
+		(#{personInfo.userId},#{username},#{password},#{createTime},#{lastEditTime})
+	</insert>
+	
+	<select id="queryLocalAuth" parameterType="String" resultMap="LocalAuthMap">
+	  select 
+	   l.local_auth_id,
+	   l.user_id,
+	   l.user_name,
+	   l.password,
+	   l.create_time,
+	   l.last_edit_time,
+	   p.name,
+	   p.gender,
+	   p.phone,
+	   p.email,
+	   p.profile_img,
+	   p.user_type,
+	   p.create_time,
+	   p.last_edit_time,
+	   p.enable_status
+	  from
+	   tb_local_auth l
+	   left join
+	   tb_person_info p 
+	   on l.user_id = p.user_id
+	  where
+	   user_name = #{username}
+	   and password = #{password}
+	  
+	</select>
+	
+	<select id="queryLocalAuthByUserId" parameterType="Long" resultMap="LocalAuthMap">
+	  select 
+	   l.local_auth_id,
+	   l.user_id,
+	   l.user_name,
+	   l.password,
+	   l.create_time,
+	   l.last_edit_time,
+	   p.name,
+	   p.gender,
+	   p.phone,
+	   p.email,
+	   p.profile_img,
+	   p.user_type,
+	   p.create_time,
+	   p.last_edit_time,
+	   p.enable_status
+	  from
+	   tb_local_auth l
+	   left join
+	   tb_person_info p 
+	   on l.user_id = p.user_id
+	  where
+	   l.user_id = #{userId}
+	  
+	</select>
+	
+	<update id="updateLocalAuth">
+	  update tb_local_auth
+	  <set>
+	    <if test="newPassword != null">password = #{newPassword},</if>
+	    <if test="lastEditTime != null">last_edit_time = #{lastEditTime}</if>
+	  </set>
+	   where 
+	     user_name = #{username}
+	     and password = #{password} 
+	     and user_id = #{userId}
+	
+	</update>
+	
+</mapper>
